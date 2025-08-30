@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserSchema {
+  id        Int      @id @default(autoincrement())
+  fullname  String
+  email     String   @unique
+  uid       String?  @unique
+  imageUrl  String   @default("")
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SongSchema {
+  id       Int    @id @default(autoincrement())
+  title    String
+  artist   String
+  imageUrl String @default("")
+  audioUrl String
+  duration Int
+
+  albumId Int? //reference key to AlbumSchema
+  album   AlbumSchema? @relation(fields: [albumId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AlbumSchema {
+  id          Int    @id @default(autoincrement())
+  title       String
+  artist      String
+  imageUrl    String @default("")
+  releaseYear String
+
+  songs SongSchema[] //one-to-many relation
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MessageSchema {
+  id         Int    @id @default(autoincrement())
+  senderId   String //clerk user ID
+  receiverId String //clerk user ID
+  content    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

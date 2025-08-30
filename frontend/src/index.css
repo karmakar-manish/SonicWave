@@ -1,0 +1,7 @@
+/* Sidebar text labels */
+
+/* When sidebar is very narrow, hide labels */
+[data-panel-size='10'] .sidebar-label,
+[data-panel-size='0'] .sidebar-label {
+  display: none;
+}
