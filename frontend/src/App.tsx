@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify'
 import ChatPage from './pages/ChatPage'
 import AlbumPage from './pages/album/AlbumPage'
 import NotFoundPage from './pages/404/NotFoundPage'
+import AdminPage from './pages/admin/AdminPage'
 function App() {
 
   //get the current user details from "/auth/me" route of backend
@@ -26,6 +27,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to={"/"} />} />
+        <Route path='/admin' element={authUser ? <AdminPage />: <Navigate to={"/login"}/>} />
 
         <Route element={<MainLayout />}>
           <Route path='/' element={<Homepage />} />

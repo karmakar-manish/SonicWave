@@ -5,7 +5,13 @@ const client = new PrismaClient()
 export async function getAllAlbums(req:any, res:any)
 {
     try{
-        const albums = await client.albumSchema.findMany()
+        const albums = await client.albumSchema.findMany(
+            {
+                include: {
+                    songs: true
+                }
+            }
+        )
         return res.status(200).json(albums)
     }catch(err)
     {

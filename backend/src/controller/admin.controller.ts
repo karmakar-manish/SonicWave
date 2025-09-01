@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client"
 const client = new PrismaClient()
 import cloudinary from "../lib/cloudinary"
-
+import fs from "fs";
 
 //helper functions to upload to cloudinary
 async function uploadToCloudinary(file: any) {
@@ -23,7 +23,7 @@ export async function checkAdmin(req: any, res: any) {
         // console.log("current User: ", currentUser);
 
         const isAdmin = process.env.ADMIN_EMAIL === currentUser.email
-        return res.status(200).json({isAdmin})
+        return res.status(200).json({ isAdmin })
     }
     catch (err) {
         console.log("Error from requireAdmin route: ", err);
@@ -36,27 +36,41 @@ export async function createSong(req: any, res: any, next: any) {
     try {
         //check if user has both audio and image file
         if (!req.files || !req.files.audioFile || !req.files.imageFile) {
-            return res.status(400).json({ message: "Please upload all files" })
+            return res.status(400).json({ message: "Audio and image files are required" })
         }
-
+       
         const { title, artist, albumId, duration } = req.body
 
-        const audioFile = req.files.audioFile
-        const imageFile = req.files.imageFile
+        // const audioFile = req.files.audioFile
+        // const imageFile = req.files.imageFile
+        const audioFile = (req.files as any).audioFile
+        const imageFile = (req.files as any).imageFile
 
-        //save it to cloudinary
-        const audioUrl = await uploadToCloudinary(audioFile)
-        const imageUrl = await uploadToCloudinary(imageFile)
+        //upload audio
+        const audioUpload = await cloudinary.uploader.upload(audioFile.tempFilePath, {
+            resource_type: "video",     //cloudinary treats audio as video
+            folder: "songs/audio"
+        })
+        //upload audio
+        const imageUpload = await cloudinary.uploader.upload(imageFile.tempFilePath, {
+            resource_type: "image",
+            folder: "songs/image"
+        })
+
+        // delete temp files after upload
+        fs.unlinkSync(audioFile.tempFilePath);
+        fs.unlinkSync(imageFile.tempFilePath);
+
 
         //create a new song instance
         const song = await client.songSchema.create({
             data: {
                 title,
                 artist,
-                imageUrl,
-                audioUrl,
-                duration,
-                albumId: albumId || null
+                imageUrl: imageUpload.secure_url,
+                audioUrl: audioUpload.secure_url,
+                duration: parseInt(duration),
+                albumId: parseInt(albumId) || null
             }
         })
 
@@ -64,7 +78,7 @@ export async function createSong(req: any, res: any, next: any) {
         if (albumId) {
             await client.albumSchema.update({
                 where: {
-                    id: albumId
+                    id: parseInt(albumId)
                 },
                 data: {
                     songs: {
@@ -105,6 +119,15 @@ export async function deleteSong(req: any, res: any) {
                 }
             })
         }
+
+        //delete the song
+        await client.songSchema.delete({
+            where: {
+                id: song?.id
+            }
+        })
+
+
         res.status(200).json({ message: "Song deleted successfully!" })
 
     } catch (err) {
@@ -145,14 +168,14 @@ export async function deleteAlbum(req: any, res: any, next: any) {
         //delete all the songs belonging to the album
         await client.songSchema.deleteMany({
             where: {
-                albumId: id
+                albumId: parseInt(id)
             }
         })
 
         //delete the album
         await client.albumSchema.delete({
             where: {
-                id: id
+                id: parseInt(id)
             }
         })
         res.status(200).json({ message: "Album deleted successfully!" })

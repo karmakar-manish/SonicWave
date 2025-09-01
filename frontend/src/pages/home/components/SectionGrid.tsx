@@ -8,7 +8,6 @@ export default function SectionGrid({title, songs, isPending}: {
     isPending: boolean
 })
 {
-    console.log(songs)
     //incase of pending
     if(isPending)
     {

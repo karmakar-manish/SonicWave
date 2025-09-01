@@ -2,13 +2,13 @@ import { useAuthUserHook } from "../../hooks/useAuthUserHook"
 import { HomeIcon, Library, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import PlaylistSkeleton from "../skeletons/PlaylistSkeleton";
-import { useAlbums } from "../../hooks/useMusicHook";
+import {  useFetchAlbums } from "../../hooks/useMusicHook";
 import type { albumInterface } from "@/types";
 
 export default function LeftSidebar() {
     const { data: authUser } = useAuthUserHook()
 
-    const {data: allAlbums, isPending: isAlbumsLoading} = useAlbums()
+    const {data: allAlbums, isPending: isAlbumsLoading} = useFetchAlbums()
 
 
     return <div className="h-full flex flex-col gap-2">

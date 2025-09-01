@@ -15,6 +15,7 @@ export interface albumInterface{
     title: string,
     artist: string,
     imageUrl: string,
+    songs: []
     releaseYear: string,
     createdAt: string,
     updatedAt: string
@@ -25,4 +26,11 @@ export interface userInterface{
     fullname: string,
     email: string,
     imageUrl: string,
+}
+
+export interface Stats{
+    totalSongs: number,
+    totalAlbums: number,
+    totalUsers: number,
+    totalArtists: number
 }

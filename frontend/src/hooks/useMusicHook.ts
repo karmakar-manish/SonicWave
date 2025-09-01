@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 
 
 //get all the albums
-export function useAlbums() {
+export function useFetchAlbums() {
     return useQuery({
         queryKey: ["allAlbums"],
         queryFn: async () => {
@@ -88,3 +88,38 @@ export function useMadeForYouSongs() {
         }
     })
 }
+
+//get song stats
+export function useFetchStats() {
+    return useQuery({
+        queryKey: ["allStats"],
+        queryFn: async () => {
+            try {
+                const res = await axiosInstance.get("/stats")
+                return res.data
+            } catch (err: any) {
+                toast.error(err.response.data.message || "Error while fetching madeForYou songs")
+                throw err
+            }
+        }
+    })
+}
+
+//get all songs
+export function useFetchSongs() {
+    return useQuery({
+        queryKey: ["allSongs"],
+        queryFn: async () => {
+
+            try {
+                const res = await axiosInstance.get("/songs")
+                return res.data
+
+            } catch (err: any) {
+                toast.error(err.response.data.message || "Error while fetching madeForYou songs")
+                throw err
+            }
+        }
+    })
+}
+
