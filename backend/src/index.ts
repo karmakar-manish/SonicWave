@@ -4,6 +4,7 @@ import fileUpload from "express-fileupload"
 import path from "path"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import { createServer } from "http"
 
 import userRoutes from "./routes/user.route"
 import authRoutes from "./routes/auth.route"
@@ -11,11 +12,15 @@ import adminRoutes from "./routes/admin.route"
 import songRoutes from "./routes/song.route"
 import albumRoutes from "./routes/album.route"
 import statRoutes from "./routes/stat.route"
+import { initializeSocket } from "./lib/socket"
 
 dotenv.config()
-
-// const __dirname = path.resolve();
 const app = express()
+
+//initializing socket.io
+const httpSever = createServer(app)
+initializeSocket(httpSever)
+
 app.use(cookieParser())
 
 app.use(cors({
@@ -50,6 +55,6 @@ app.use((err: any, req: any, res: any, next: any) => {
 })
 
 const port = process.env.PORT || 4000
-app.listen(port, () => {
+httpSever.listen(port, () => {
     console.log(`Server is listening on ${port} port.`);
 })

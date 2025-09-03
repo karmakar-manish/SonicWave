@@ -2,11 +2,13 @@ import { HeadphonesIcon, Music, Users } from "lucide-react"
 import { useFetchUsers } from "../hooks/useChatHook"
 import { useAuthUserHook } from "../hooks/useAuthUserHook"
 import type { userInterface } from "../types/index"
+import { useChatStore } from "../hooks/useChatStore"
 
 export default function FriendsActivity() {
     const { data: authUser } = useAuthUserHook()
     const { data: getAllUsers } = useFetchUsers()
-    const isPlaying = true;
+    const { onlineUsers, userActivities } = useChatStore()
+
 
     return <div className="h-full bg-zinc-900 rounded-lg flex flex-col overflow-hidden">
         <div className="p-4 flex justify-between items-center border-b border-zinc-800">
@@ -19,43 +21,55 @@ export default function FriendsActivity() {
         {!authUser ? <LoginPrompt /> : (
             <div className="flex-1 ">
                 <div className="p-4 space-y-4">
-                    {getAllUsers?.map((user: userInterface) => (
-                        <div key={user.id} className="cursor-pointer hover:bg-zinc-800/50 p-3 rounded-md transition-colors group flex gap-3 truncate">
-                            <div className="relative">
-                                <div className="chat-image avatar size-10 border border-zinc-800 rounded-full">
-                                    {user.imageUrl.length == 0 ? (
-                                        <div className="">
-                                            <p className="text-xl font-semibold
+                    {getAllUsers?.map((user: userInterface) => {
+                        
+                        const activity = userActivities.get(user.id.toString())
+                        const isPlaying = activity && activity !== "Idle"
+
+                        return (
+                            <div key={user.id} className="cursor-pointer hover:bg-zinc-800/50 p-3 rounded-md transition-colors group flex gap-3 truncate">
+                                <div className="relative">
+                                    <div className="chat-image avatar size-10 border border-zinc-800 rounded-full">
+                                        {user.imageUrl.length == 0 ? (
+                                            <div className="">
+                                                <p className="text-xl font-semibold
                                              size-10 rounded-full text-center flex justify-center items-center">{user.fullname[0]}</p>
+                                            </div>
+                                        ) : (
+                                            <img src={user.imageUrl || "/avatar.png"} alt={user.fullname} className="rounded-full " />
+                                        )}
+                                        <div className={`absolute bottom-0 right-0 size-3 rounded-full border-2 border-zinc-900
+                                        ${onlineUsers.has(user.id.toString()) ? "bg-green-500" : "bg-zinc-500"}`} 
+                                         aria-hidden="true"/>
+                                    </div>
+
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium text-sm text-white truncate">{user.fullname}</span>
+                                        {isPlaying && <Music className="size-3.5 text-emerald-400 shrink-0" />}
+                                    </div>
+
+                                    {isPlaying ? (
+                                        <div className="mt-1">
+                                            <div className="mt-1 text-sm text-white font-medium truncate">
+                                                {/* song name  */}
+                                                {activity.replace("Playing", "").split(" by ")[0]}
+                                            </div>
+                                            <div className="text-xs text-zinc-400 truncate">
+                                                {/* artist name  */}
+                                                {activity.split(" by ")[1]}
+                                            </div>
                                         </div>
                                     ) : (
-                                        <img src={user.imageUrl || "/avatar.png"} alt={user.fullname} className="rounded-full " />
+                                        <div className="mt-1 text-xs text-zinc-400">Idle</div>
                                     )}
-                                <div className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-zinc-900 bg-zinc-500" aria-hidden="true" />
                                 </div>
 
                             </div>
-
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                    <span className="font-medium text-sm text-white truncate">{user.fullname}</span>
-                                    {isPlaying && <Music className="size-3.5 text-emerald-400 shrink-0"/>}
-                                </div>
-
-                                {isPlaying ? (
-                                    <div className="mt-1">
-                                        <div className="mt-1 text-sm text-white font-medium truncate">
-                                            Cardigan
-                                        </div>
-                                        <div className="text-xs text-zinc-400 truncate">by Taylor Swift</div>
-                                    </div>
-                                ):(
-                                    <div className="mt-1 text-xs text-zinc-400">Idle</div>
-                                )}
-                            </div>
-
-                        </div>
-                    ))}
+                        )
+                    })}
                 </div>
             </div>
         )}

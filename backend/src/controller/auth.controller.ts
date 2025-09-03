@@ -4,9 +4,9 @@ import generateToken_Cookie from "../lib/utils"
 const client = new PrismaClient()
 
 
-export async function signup(req: any, res: any) {
+export async function signup(req: any, res: any, next: any) {
     const { fullname, email, password, uid } = req.body
-    if (!fullname || !email || !password )
+    if (!fullname || !email || !password)
         return res.status(400).json({ message: "All fields are required!" })
 
     try {
@@ -39,7 +39,7 @@ export async function signup(req: any, res: any) {
         })
 
         //generate the token and get the cookie
-        const token = generateToken_Cookie({userId: user.id, res})
+        const token = generateToken_Cookie({ userId: user.id, res })
 
         return res.status(200).json({
             message: "User registered successfully!",
@@ -54,47 +54,90 @@ export async function signup(req: any, res: any) {
     }
 }
 
-export async function login(req:any, res:any) {
-    const {email, password} = req.body 
-    if(!email || !password)
-        return res.status(400).json({message:"All fields are required!"})
+//login function
+export async function login(req: any, res: any, next: any) {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Invalid credentials!"
+            })
+        }
 
-    try{
-        //check if user exists with given email
+        //find the user in the database
         const user = await client.userSchema.findFirst({
             where: {
-                email
+                email: email
             }
         })
-        if(!user)
-            return res.status(400).json({message: "Invalid credentials!"})
+        //incase no user is found 
+        if (!user) {
+            return res.status(400).json({
+                message: "Invalid credentials!"
+            })
+        }
+        //now check the password 
+        const isMatch = await bcrypt.compare(password, user.password)
 
-        //now check the hashed password
-        const checkedPassword = await bcrypt.compare(password, user.password)
+        //incase of password mismatch
+        if (!isMatch) {
+            return res.status(400).json({
+                message: "Invalid credentials!"
+            })
+        }
 
-        if(!checkedPassword)
-            return res.status(400).json({message: "Invalid credentials!"})
-        
-        //generate the token and put it in cookie
-        const token = generateToken_Cookie({userId: user.id, res})
+        //create the JWT token and store in cookie
+        const token = generateToken_Cookie({ userId: user.id, res })
 
         return res.status(200).json({
-            message: "User registered successfully!",
+            message: "Logged in successfully!",
+            token: token
+        })
+
+    } catch (err: any) {
+        next(err)   //error handling middleware
+    }
+}
+
+//login with google route
+export async function providerLogin(req: any, res: any, next: any) {
+    //get the uid from the body
+    const { uid } = req.body
+    // const { fullname, email, password, uid } = req.body
+    if (!uid)
+        return res.status(400).json({ message: "Email not provided!" })
+
+    try {
+        //check if user exists with given uid
+        const user = await client.userSchema.findFirst({
+            where: {
+                uid
+            }
+        })
+        if (!user)
+        {
+            return res.status(400).json({ message: "No account found. Signup instead" })
+        }
+
+        //generate the token and put it in cookie
+        const token = generateToken_Cookie({ userId: user.id, res })
+
+        return res.status(200).json({
+            message: "Logged in successfully!",
             token: token
         })
 
 
-    }catch(err)
-    {
+    } catch (err) {
         console.log("Error from login route: ", err);
-        res.status(500).json({ message: "Internal server error" })
+        // res.status(500).json({ message: "Internal server error" })   
+        next(err)   //calling the error handling middleware
     }
 }
 
-export async function logout(req:any, res:any)
-{
+export async function logout(req: any, res: any) {
     //clear the cookie
     res.clearCookie("token")
 
-    return res.json({message:"Logged out successfully!"})
+    return res.json({ message: "Logged out successfully!" })
 }

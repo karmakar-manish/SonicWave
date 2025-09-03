@@ -2,13 +2,14 @@ import { initializeApp } from "firebase/app"
 import { getAuth, GoogleAuthProvider } from "firebase/auth"
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCt-UqcomkZrQAiqMFT0tDEN504v4GibGQ",
-    authDomain: "assemblemessaging.firebaseapp.com",
-    projectId: "assemblemessaging",
-    storageBucket: "assemblemessaging.firebasestorage.app",
-    messagingSenderId: "275198981880",
-    appId: "1:275198981880:web:ff7a21df4202c40455ed0d"
+  apiKey: "AIzaSyD3gPT4NC7oeXq8clhlfgg31m_YWzz7T50",
+  authDomain: "sonicwave-605a5.firebaseapp.com",
+  projectId: "sonicwave-605a5",
+  storageBucket: "sonicwave-605a5.firebasestorage.app",
+  messagingSenderId: "803223581352",
+  appId: "1:803223581352:web:b2a295395a457da5ad489d"
 };
+
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
