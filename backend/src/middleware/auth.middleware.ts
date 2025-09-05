@@ -58,12 +58,15 @@ export async function requireAdmin(req: any, res: any, next: any) {
     //get the current user's email
     try {
         const currentUser = req.user 
-        // console.log("current User: ", currentUser);
-
-        const isAdmin = process.env.ADMIN_EMAIL === currentUser.email
+        //check if the currentUser's email is in AdminSchema or not
+        const admin = await client.adminSchema.findFirst({
+            where: {
+                email: currentUser.email
+            }
+        })
 
         //incase current user is not admin
-        if (!isAdmin)
+        if (!admin)
             return res.status(403).json({ message: "Unauthorized - you must be an admin" })
         next()
 

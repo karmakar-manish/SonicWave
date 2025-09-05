@@ -27,7 +27,7 @@ export async function checkAdmin(req: any, res: any) {
                 email: currentUser.email
             }
         })
-
+    
         if (admin)
             return res.status(200).json({ isAdmin: true })
         else
