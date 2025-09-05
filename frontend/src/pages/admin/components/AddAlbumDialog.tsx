@@ -1,7 +1,8 @@
 import { useRef, useState } from "react"
-import { PlusCircle, Upload, X } from "lucide-react"
+import { Loader, PlusCircle, Upload, X } from "lucide-react"
 import { toast } from "react-toastify"
 import { axiosInstance } from "../../../lib/axios"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface NewAlbum {
     title: string,
@@ -11,6 +12,7 @@ interface NewAlbum {
 
 export default function AddAlbumDialog() {
 
+    const queryClient = useQueryClient()
     const [albumDialogOpen, setAlbumDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -32,7 +34,9 @@ export default function AddAlbumDialog() {
 
         try {
             if (!files.image) {
-                return toast.error("Please upload image file")
+                toast.error("Please upload image file")
+                setIsLoading(false)
+                return 
             }
             const formData = new FormData()
 
@@ -48,6 +52,9 @@ export default function AddAlbumDialog() {
                     }
                 }
             )
+
+            queryClient.invalidateQueries({ queryKey: ["allStats"] }) //refetch
+            queryClient.invalidateQueries({ queryKey: ["allAlbums"] }) //refetch
 
             //reset state variables
             setNewAlbum({
@@ -65,6 +72,20 @@ export default function AddAlbumDialog() {
         } catch (err: any) {
             toast.error("Failed to add album")
         }
+    }
+    //function to reset state varible values on cancel and cross button click
+    function handleCancel() {
+        //reset state variables
+        setNewAlbum({
+            title: "",
+            artist: "",
+            releaseYear: ""
+        })
+        setFiles({
+            image: null
+        })
+        setAlbumDialogOpen(false)
+        setIsLoading(false)
     }
 
     return (
@@ -147,17 +168,21 @@ export default function AddAlbumDialog() {
 
                             </div>
 
-                            <div className="text-right mt-2">
+                            <div className="mt-2 flex  justify-end items-center">
                                 <button onClick={() => setAlbumDialogOpen(false)} className="bg-red-100 px-2 py-1 text-red-600 rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">Cancel</button>
-                                <button onClick={handleSubmit} disabled={isLoading} 
-                                className="bg-green-500 px-2 py-1 text-white rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">{isLoading ? "Uploading..." : "Add Album"}</button>
+                                <button onClick={handleSubmit} disabled={isLoading}
+                                    className="bg-green-500 px-2 py-1 text-white rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">
+                                    {isLoading ? (
+                                        <div className="flex gap-2 items-center justify-center">
+                                            <Loader className="size-5 animate-spin hover:cursor-not-allowed" />
+                                            Uploading
+                                        </div>
+                                    ) : "Add Album"}</button>
                             </div>
 
 
                             <button className="absolute top-0 right-0 p-2 cursor-pointer hover:scale-105"
-                                onClick={() => {
-                                    setAlbumDialogOpen(false)
-                                }}>
+                                onClick={handleCancel}>
                                 < X className="size-5" />
                             </button>
                         </div>

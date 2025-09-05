@@ -36,9 +36,9 @@ function App() {
 
         <Route element={<MainLayout />}>
           <Route path='/' element={<Homepage />} />
-          <Route path='/chat' element={<ChatPage />} />
-          <Route path='/albums/:albumId' element={<AlbumPage />} />
-          <Route path='/profile' element={<ProfilePage/>}/>
+          <Route path='/chat' element={authUser? <ChatPage />: <Navigate to={"/"}/>} />
+          <Route path='/albums/:albumId' element={authUser? <AlbumPage />: <Navigate to={"/"}/>} />
+          <Route path='/profile' element={authUser? <ProfilePage />: <Navigate to={"/"}/>}/>
 
           {/* for any route other than the above  */}
           <Route path='*' element={<NotFoundPage />} />

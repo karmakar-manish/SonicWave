@@ -25,13 +25,20 @@ model UserSchema {
   updatedAt DateTime @updatedAt
 }
 
+model AdminSchema {
+  id    Int    @id @default(autoincrement())
+  email String @unique
+}
+
 model SongSchema {
-  id       Int    @id @default(autoincrement())
-  title    String
-  artist   String
-  imageUrl String @default("")
-  audioUrl String
-  duration Int
+  id              Int     @id @default(autoincrement())
+  title           String
+  artist          String
+  imageUrl        String  @default("")
+  img_public_id   String? @default("") //for deleting the cloudinary image later
+  audioUrl        String
+  audio_public_id String? @default("") //for deleting the audio url later from cloudinary
+  duration        Int
 
   albumId Int? //reference key to AlbumSchema
   album   AlbumSchema? @relation(fields: [albumId], references: [id])
@@ -41,10 +48,11 @@ model SongSchema {
 }
 
 model AlbumSchema {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   title       String
   artist      String
-  imageUrl    String @default("")
+  imageUrl    String  @default("")
+  public_id   String? @default("") //for deleting the cloudinary image later
   releaseYear String
 
   songs SongSchema[] //one-to-many relation

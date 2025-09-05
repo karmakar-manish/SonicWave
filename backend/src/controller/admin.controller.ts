@@ -9,7 +9,7 @@ async function uploadToCloudinary(file: any) {
         const result = await cloudinary.uploader.upload(file.tempFilePath, {
             resource_type: "auto"
         })
-        return result.secure_url
+        return result
     } catch (err) {
         console.log("Error in upload to cloudinary function: ", err);
         throw new Error("Error uploading to cloudinary")
@@ -20,10 +20,19 @@ async function uploadToCloudinary(file: any) {
 export async function checkAdmin(req: any, res: any) {
     try {
         const currentUser = req.user
-        // console.log("current User: ", currentUser);
 
-        const isAdmin = process.env.ADMIN_EMAIL === currentUser.email
-        return res.status(200).json({ isAdmin })
+        //check if the currentUser's email is in AdminSchema or not
+        const admin = await client.adminSchema.findFirst({
+            where: {
+                email: currentUser.email
+            }
+        })
+
+        if (admin)
+            return res.status(200).json({ isAdmin: true })
+        else
+            return res.status(200).json({ isAdmin: false })
+
     }
     catch (err) {
         console.log("Error from requireAdmin route: ", err);
@@ -38,7 +47,7 @@ export async function createSong(req: any, res: any, next: any) {
         if (!req.files || !req.files.audioFile || !req.files.imageFile) {
             return res.status(400).json({ message: "Audio and image files are required" })
         }
-       
+
         const { title, artist, albumId, duration } = req.body
 
         // const audioFile = req.files.audioFile
@@ -57,6 +66,7 @@ export async function createSong(req: any, res: any, next: any) {
             folder: "songs/image"
         })
 
+
         // delete temp files after upload
         fs.unlinkSync(audioFile.tempFilePath);
         fs.unlinkSync(imageFile.tempFilePath);
@@ -68,7 +78,9 @@ export async function createSong(req: any, res: any, next: any) {
                 title,
                 artist,
                 imageUrl: imageUpload.secure_url,
+                img_public_id: imageUpload.public_id,
                 audioUrl: audioUpload.secure_url,
+                audio_public_id: audioUpload.public_id,
                 duration: parseInt(duration),
                 albumId: parseInt(albumId) || null
             }
@@ -104,6 +116,7 @@ export async function deleteSong(req: any, res: any) {
             }
         })
 
+
         //if song belongs to an album, update the album's song array
         if (song?.albumId) {
             await client.albumSchema.update({
@@ -119,6 +132,15 @@ export async function deleteSong(req: any, res: any) {
                 }
             })
         }
+
+        //1. delete the cloudinary image of the song
+        if (song?.img_public_id && song.img_public_id.length > 0)
+            await cloudinary.uploader.destroy(song.img_public_id)
+
+        // 2. delete the cloudinary audio of the song
+        if (song?.audio_public_id && song.audio_public_id.length > 0)
+            await cloudinary.uploader.destroy(song.audio_public_id, { resource_type: "video" })
+
 
         //delete the song
         await client.songSchema.delete({
@@ -142,13 +164,14 @@ export async function createAlbum(req: any, res: any, next: any) {
         const { title, artist, releaseYear } = req.body
         const { imageFile } = req.files
 
-        const imageUrl = await uploadToCloudinary(imageFile)
+        const image = await uploadToCloudinary(imageFile)
 
         const album = await client.albumSchema.create({
             data: {
                 title,
                 artist,
-                imageUrl,
+                imageUrl: image.secure_url,
+                public_id: image.public_id,
                 releaseYear
             }
         })
@@ -165,14 +188,46 @@ export async function deleteAlbum(req: any, res: any, next: any) {
     try {
         const { id } = req.params
 
-        //delete all the songs belonging to the album
+        //1. first fetch all songs belonging to the album
+        const allsongs = await client.songSchema.findMany({
+            where: {
+                albumId: parseInt(id)
+            }
+        })
+
+        //2. Delete cloudinary image and audio for each song
+        for (const song of allsongs) {
+            if (song?.img_public_id && song.img_public_id.length > 0)
+                await cloudinary.uploader.destroy(song.img_public_id)
+
+            // 2. delete the cloudinary audio of the song
+            if (song?.audio_public_id && song.audio_public_id.length > 0)
+                await cloudinary.uploader.destroy(song.audio_public_id, { resource_type: "video" })
+            // Cloudinary audio must be deleted with { resource_type: "video" }
+
+        }
+
+        //3. delete all the songs belonging to the album
         await client.songSchema.deleteMany({
             where: {
                 albumId: parseInt(id)
             }
         })
 
-        //delete the album
+        //4. find the album to be deleted
+        const album = await client.albumSchema.findFirst({
+            where: {
+                id: parseInt(id)
+            }
+        })
+
+        //5. Delete the image of the album
+        if (album?.public_id && album?.public_id.length > 0) {
+            await cloudinary.uploader.destroy(album.public_id)
+        }
+
+
+        //6. delete the album
         await client.albumSchema.delete({
             where: {
                 id: parseInt(id)

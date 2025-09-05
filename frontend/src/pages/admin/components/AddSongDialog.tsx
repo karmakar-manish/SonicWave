@@ -1,9 +1,10 @@
 import { useRef, useState } from "react"
 import { useFetchAlbums } from "../../../hooks/useMusicHook"
-import { PlusCircle, Upload, X } from "lucide-react"
+import { Loader, PlusCircle, Upload, X } from "lucide-react"
 import type { albumInterface } from "../../../types"
 import { toast } from "react-toastify"
 import { axiosInstance } from "../../../lib/axios"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface NewSong {
     title: string,
@@ -14,6 +15,7 @@ interface NewSong {
 
 export default function AddSongDialog() {
     const { data: allAlbums } = useFetchAlbums()
+    const queryClient = useQueryClient()
 
     const [songDialogOpen, setSongDialogOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +41,9 @@ export default function AddSongDialog() {
 
         try {
             if (!files.audio || !files.image) {
-                return toast.error("Please upload both audio and image files")
+                toast.error("Please upload both audio and image files")
+                setIsLoading(false)
+                return 
             }
             const formData = new FormData()
 
@@ -63,6 +67,9 @@ export default function AddSongDialog() {
                 }
             )
 
+            queryClient.invalidateQueries({ queryKey: ["allStats"] }) //refetch
+            queryClient.invalidateQueries({ queryKey: ["allSongs"] }) //refetch
+            
             //reset state variables
             setNewSong({
                 title: "",
@@ -81,6 +88,23 @@ export default function AddSongDialog() {
         } catch (err: any) {
             toast.error("Failed to add song")
         }
+    }
+
+    //function to reset state varible values on cancel and cross button click
+    function handleCancel() {
+        //reset state variables
+        setNewSong({
+            title: "",
+            artist: "",
+            album: "",
+            duration: "0"
+        })
+        setFiles({
+            audio: null,
+            image: null
+        })
+        setSongDialogOpen(false)
+        setIsLoading(false)
     }
 
     return (
@@ -195,16 +219,19 @@ export default function AddSongDialog() {
                                 </div>
                             </div>
 
-                            <div className="text-right mt-2">
-                                <button onClick={() => setSongDialogOpen(false)} className="bg-red-100 px-2 py-1 text-red-600 rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">Cancel</button>
-                                <button onClick={handleSubmit} disabled={isLoading} className="bg-green-500 px-2 py-1 text-white rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">{isLoading ? "Uploading..." : "Add Song"}</button>
+                            <div className="text-right mt-2 flex justify-end">
+                                <button onClick={handleCancel} className="bg-red-100 px-2 py-1 text-red-600 rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">Cancel</button>
+                                <button onClick={handleSubmit} disabled={isLoading} className="bg-green-500 px-2 py-1 text-white rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">{isLoading ? (
+                                    <div className="flex gap-2 items-center justify-center">
+                                        <Loader className="size-5 animate-spin hover:cursor-not-allowed" />
+                                        Uploading
+                                    </div>
+                                ) : "Add Song"}</button>
                             </div>
 
 
                             <button className="absolute top-0 right-0 p-2 cursor-pointer hover:scale-105"
-                                onClick={() => {
-                                    setSongDialogOpen(false)
-                                }}>
+                                onClick={handleCancel}>
                                 < X className="size-5" />
                             </button>
                         </div>

@@ -6,7 +6,7 @@ import ChatHeader from "./components/ChatHeader"
 import type { MessageInterface } from "../../types"
 import { useAuthUserHook } from "../../hooks/useAuthUserHook"
 import MessageInput from "./components/MessageInput"
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 
 //function to format the date
 function formatDate(date: string)
@@ -21,16 +21,26 @@ function formatDate(date: string)
 export default function ChatPage() {
 
     const { data: authUser } = useAuthUserHook()
-
     const { selectedUser, messages, fetchMessages } = useChatStore()
-   
+    
+    //ref for auto scroll
+    const messageEndRef = useRef<HTMLDivElement | null>(null)
+
+
 
     useEffect(()=>{
         //incase the user is selected, fetch all their messages
         if(selectedUser)    fetchMessages(selectedUser.id.toString())
     }, [selectedUser, fetchMessages])
 
-    console.log("All messages: ", fetchMessages)
+    //scroll to bottom whenever messages change
+    useEffect(()=>{
+        if(messageEndRef.current)
+        {
+            messageEndRef.current.scrollIntoView({behavior: "smooth"})
+        }
+    }, [messages])
+
 
     return (
         <div className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden mt-2">
@@ -57,10 +67,11 @@ export default function ChatPage() {
                                                 ${msg.senderId === authUser.id.toString() ? "bg-green-500" : "bg-zinc-800"}`}>
                                                 <p className="text-sm">{msg.content}</p>
                                                 <span className="text-xs text-zinc-300 mt-1 block">{formatDate(msg.createdAt)}</span>
-
                                             </div>
                                         </div>
                                     ))}
+                                    {/* dummy div for auto-scroll  */}
+                                    <div ref={messageEndRef}/>
                                 </div>
                             </div>
 

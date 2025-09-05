@@ -10,7 +10,7 @@ export default function AlbumTable() {
     const { data: allAlbums, isLoading } = useFetchAlbums()
 
     //mutation to delete an album 
-    const { mutate: deleteAlbumMutation } = useMutation({
+    const { mutate: deleteAlbumMutation, isPending: isAlbumDeleting } = useMutation({
         mutationFn: async (id: number) => {
             await axiosInstance.delete(`/admin/albums/${id}`)
         },
@@ -65,8 +65,10 @@ export default function AlbumTable() {
                                 {album.songs.length} songs
                             </span>
                         </div>
-                        <button className="btn-ghost text-red-400 hover:text-red-300 hover:bg-red-400/10 cursor-pointer"
-                            onClick={() => deleteAlbumMutation(album.id)}>
+                        <button className={`btn-ghost text-red-400 hover:text-red-300 hover:bg-red-400/10 ${isAlbumDeleting ? "cursor-not-allowed" : "cursor-pointer"}`}
+                            onClick={() => deleteAlbumMutation(album.id)}
+                            disabled={isAlbumDeleting}
+                        >
                             <Trash2 className="size-4" />
                         </button>
                     </div>

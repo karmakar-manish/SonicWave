@@ -41,6 +41,12 @@ export default function LoginForm() {
         loginMutation({ email, password })
     }
 
+    //button function for guest login
+    function handleGuestLogin()
+    {
+        //call the mutation function with default values
+        loginMutation({email:"kaptaanjacksparrow106@gmail.com", password:"123456"})
+    }
     //mutation for provider login
     const { mutate: providerLoginMutation, isPending: isProviderPending } = useMutation({
         mutationFn: async () => {
@@ -141,9 +147,14 @@ export default function LoginForm() {
         <p className="text-sm text-gray-200 text-center mt-6">
             New to <span className="font-semibold">Sonic Wave</span>?{" "}
             <Link to={"/signup"} className="text-yellow-400 hover:underline">
-                Sign up
+                Sign up {" "}
             </Link>
+            {" "} or {" "}
+            <button className="cursor-pointer" onClick={handleGuestLogin}>
+                <p className="text-yellow-400 hover:underline">Guest Login</p>
+            </button>
         </p>
+
 
     </motion.div>
 }

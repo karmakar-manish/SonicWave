@@ -8,18 +8,19 @@ import { toast } from "react-toastify"
 export default function SongsTable() {
     const queryClient = useQueryClient()
     const { data: allSongs, isLoading } = useFetchSongs()
-    
+
+
     //mutation to delete a song
-    const {mutate: deleteSongMutation} = useMutation({
-        mutationFn: async(id: number)=>{
+    const { mutate: deleteSongMutation, isPending: isSongDeleting } = useMutation({
+        mutationFn: async (id: number) => {
             await axiosInstance.delete(`/admin/songs/${id}`)
         },
-        onSuccess: ()=>{
+        onSuccess: () => {
             toast.success("Song deleted successfully!")
-            queryClient.invalidateQueries({queryKey: ["allSongs"]}) //refetch
-            queryClient.invalidateQueries({queryKey: ["allStats"]}) //refetch
+            queryClient.invalidateQueries({ queryKey: ["allSongs"] }) //refetch
+            queryClient.invalidateQueries({ queryKey: ["allStats"] }) //refetch
         },
-        onError: (err:any)=>{
+        onError: (err: any) => {
             toast.error(err.respose.data.error)
         }
     })
@@ -59,7 +60,11 @@ export default function SongsTable() {
                                 {song.createdAt.split("T")[0]}
                             </span>
                         </div>
-                        <button className="btn-ghost text-red-400 hover:text-red-300 hover:bg-red-400/10 cursor-pointer" onClick={()=>deleteSongMutation(song.id)}>
+                        <button className={`btn-ghost text-red-400 hover:text-red-300 hover:bg-red-400/10 
+                        ${isSongDeleting ? "cursor-not-allowed" : "cursor-pointer"}`}
+                            onClick={() => deleteSongMutation(song.id)}
+                            disabled={isSongDeleting}
+                        >
                             <Trash2 className="size-4" />
                         </button>
                     </div>

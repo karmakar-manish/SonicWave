@@ -8,6 +8,7 @@ export function useCheckAdmin(options={}) {
         queryFn: async () => {
             try {
                 const res = await axiosInstance.get("/admin/checkAdmin")
+                console.log("result is : ", res.data)
                 return res.data
             } catch (err: any) {
                 toast.error(err.response.data.message || "Error while fetching albums")
