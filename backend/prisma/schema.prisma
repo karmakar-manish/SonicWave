@@ -19,6 +19,7 @@ model UserSchema {
   email     String   @unique
   uid       String?  @unique
   imageUrl  String   @default("")
+  public_id String?  @default("") //for deleting the cloudinary image later
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

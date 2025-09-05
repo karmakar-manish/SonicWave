@@ -33,7 +33,7 @@ export default function ChatPage() {
     console.log("All messages: ", fetchMessages)
 
     return (
-        <div className="h-ful  rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden mt-2">
+        <div className="h-full rounded-lg bg-gradient-to-b from-zinc-800 to-zinc-900 overflow-hidden mt-2">
             <Topbar />
             <div className="grid lg:grid-cols-[300px_1fr] grid-cols-[80px_1fr] h-[calc(100vh-180px)]">
                 <UsersList />
@@ -49,8 +49,8 @@ export default function ChatPage() {
                                         <div key={msg.id} className={`flex items-start gap-3 ${msg.senderId === authUser.id.toString() ? "flex-row-reverse" : ""}`}>
 
                                             <div className="size-8 md:size-12 ">
-                                                <img src={msg.senderId === authUser.id ? authUser.imageUrl : selectedUser.imageUrl || "/avatar.png"}
-                                                    className="rounded-full" />
+                                                <img src={(msg.senderId === authUser.id.toString() ? authUser.imageUrl : selectedUser.imageUrl) || "/avatar.png"}
+                                                    className="rounded-full size-8 md:size-12" />
                                             </div>
 
                                             <div className={`rounded-lg p-3 max-w-[70%]

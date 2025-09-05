@@ -28,7 +28,7 @@ app.use(cors({
     credentials: true
 }))
 
-app.use(express.json())
+app.use(express.json({limit: "10mb"}))
 
 //under the current folder in backend, create the temporary folder to store image
 //this will hold the files before uploading to cloudinary

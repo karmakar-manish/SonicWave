@@ -24,7 +24,7 @@ export default function UsersList() {
                                     <div className="relative">
                                         <div className="size-8 md:size-12 ">
                                             <img src={user.imageUrl || "/avatar.png"} alt={user.fullname[0]} 
-                                            className="rounded-full"/>
+                                            className="rounded-full size-8 md:size-12" />
                                         </div>
                                         {/* online indicator */}
                                         <div className={`absolute bottom-0 right-0 ring-2 ring-zinc-900 size-3  rounded-full ${onlineUsers.has(user.id.toString()) ? "bg-green-500": "bg-zinc-500"}`}/>

@@ -56,14 +56,14 @@ export default function ProfileSection() {
     return (
         <div className="relative">
             <div ref={avatarRef} className=" flex justify-center size-10 rounded-full transition-all hover:scale-110 cursor-pointer hover:border-2" onClick={() => setOpen((prev) => !prev)}>
-                <img src={authuser.imageUrl || "/avatar.png"} alt={authuser.fullname} className="rounded-full " />
+                <img src={authuser.imageUrl || "/avatar.png"} alt={authuser.fullname} className="rounded-full size-10" />
             </div>
 
             {open && (
                 <div ref={dropdownRef} className="absolute right-3 top-9 w-50 h-fit z-10 bg-zinc-700 rounded-lg p-1">
                     <div>
                         <div className="mb-2 p-1 flex flex-col gap-1">
-                            <Link to={"/home"} className="cursor-pointer hover:bg-zinc-800 rounded-md p-2 flex justify-left items-center gap-3">
+                            <Link to={"/profile"} className="cursor-pointer hover:bg-zinc-800 rounded-md p-2 flex justify-left items-center gap-3">
                                 <User className="size-6" />
                                 <span className="font-semibold">Account</span>
                             </Link>

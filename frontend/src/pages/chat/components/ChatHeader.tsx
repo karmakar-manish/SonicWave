@@ -7,7 +7,7 @@ export default function ChatHeader() {
         <div className="flex items-center gap-3">
             <div className="size-8 md:size-12 ">
                 <img src={selectedUser?.imageUrl || "/avatar.png"} alt={selectedUser?.fullname[0]}
-                    className="rounded-full" />
+                    className="rounded-full size-8 md:size-12" />
             </div>
 
             <div className="">

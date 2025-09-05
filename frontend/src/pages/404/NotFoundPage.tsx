@@ -5,8 +5,8 @@ export default function NotFoundPage() {
 	const navigate = useNavigate();
 
 	return (
-		<div className='h-screen bg-neutral-900 flex items-center justify-center rounded-md mt-2'>
-			<div className='text-center space-y-6 px-4'>
+		<div className='h-[calc(100vh-100px)] bg-neutral-900 flex items-center justify-center rounded-md mt-2 border overflow-hidden'>
+			<div className='text-center space-y-6 px-4 '>
 				{/* Large animated musical note */}
 				<div className='flex justify-center animate-bounce'>
 					<Music2 className='h-24 w-24 text-emerald-500' />

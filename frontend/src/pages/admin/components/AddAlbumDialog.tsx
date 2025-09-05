@@ -69,7 +69,8 @@ export default function AddAlbumDialog() {
 
     return (
         <div>
-            <button className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white p-2 rounded-md cursor-pointer hover:scale-105 transition-all"
+            <button className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white p-2 
+            rounded-md cursor-pointer hover:scale-105 transition-all"
                 onClick={() => setAlbumDialogOpen(true)}>
                 <PlusCircle className=" size-4" />
                 Add Album
@@ -78,7 +79,8 @@ export default function AddAlbumDialog() {
             {/* Dialog overlay  */}
             {albumDialogOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-zinc-900 border border-zinc-800 max-h-[90vh] p-6 w-full max-w-lg rounded-md shadow-xl overflow-y-auto relative" >
+                    <div className="bg-zinc-900 border border-zinc-800 max-h-[90vh] p-6 w-full max-w-lg 
+                    rounded-md shadow-xl overflow-y-auto relative" >
                         <div className="">
                             <h2 className="text-xl font-bold">Add New album</h2>
                             <p className="text-sm font-light">Add a new album to your music library</p>
@@ -94,7 +96,8 @@ export default function AddAlbumDialog() {
                                 />
 
                                 {/* image upload area  */}
-                                <div className="flex items-center justify-center p-6 border-dashed border-2 border-zinc-700 rounded-lg cursor-pointer"
+                                <div className="flex items-center justify-center p-6 border-dashed border-2
+                                 border-zinc-700 rounded-lg cursor-pointer"
                                     onClick={() => imageInputRef.current?.click()}>
                                     <div className="text-center">
                                         {files.image ? (
@@ -146,7 +149,8 @@ export default function AddAlbumDialog() {
 
                             <div className="text-right mt-2">
                                 <button onClick={() => setAlbumDialogOpen(false)} className="bg-red-100 px-2 py-1 text-red-600 rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">Cancel</button>
-                                <button onClick={handleSubmit} disabled={isLoading} className="bg-green-500 px-2 py-1 text-white rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">{isLoading ? "Uploading..." : "Add Album"}</button>
+                                <button onClick={handleSubmit} disabled={isLoading} 
+                                className="bg-green-500 px-2 py-1 text-white rounded-md cursor-pointer mr-4 font-semibold hover:scale-105 transition-all">{isLoading ? "Uploading..." : "Add Album"}</button>
                             </div>
 
 

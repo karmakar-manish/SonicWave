@@ -11,6 +11,7 @@ import AlbumPage from './pages/album/AlbumPage'
 import NotFoundPage from './pages/404/NotFoundPage'
 import AdminPage from './pages/admin/AdminPage'
 import SignupPage from './pages/auth/SignupPage'
+import ProfilePage from './pages/profile/ProfilePage'
 
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
           <Route path='/' element={<Homepage />} />
           <Route path='/chat' element={<ChatPage />} />
           <Route path='/albums/:albumId' element={<AlbumPage />} />
+          <Route path='/profile' element={<ProfilePage/>}/>
 
           {/* for any route other than the above  */}
           <Route path='*' element={<NotFoundPage />} />

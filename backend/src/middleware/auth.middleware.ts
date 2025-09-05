@@ -24,7 +24,8 @@ export async function protectRoute(req: any, res: any, next: any) {
                 id: true,
                 fullname: true,
                 email: true,
-                imageUrl: true
+                imageUrl: true,
+                createdAt: true
             }
         })
         

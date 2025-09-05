@@ -19,9 +19,9 @@ export default function FeaturedSection()
             <div key={song.id} className="flex items-center relative bg-zinc-800/50 rounded-md hover:bg-zinc-700/50 transition-colors group cursor-pointer">
                 <img src={song.imageUrl} alt={song.title}
                 className="w-16 sm:w-20 h-16 sm:h-20 object-cover rounded-l-md" />
-                <div className="flex-1 p-4">
+                <div className="flex-1 p-4 truncate">
                     <p className="font-medium truncate">{song.title}</p>
-                    <p className="text-sm truncate text-zinc-400">{song.artist}</p>
+                    <p className="text-sm truncate text-zinc-400 ">{song.artist}</p>
                 </div>
 
                 <PlayButton song={song}/>
