@@ -2,14 +2,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-toastify"
 import { axiosInstance } from "../lib/axios"
 import { useEffect, useRef, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import {  Github, LogOutIcon, User } from "lucide-react"
 import { useAuthUserHook } from "../hooks/useAuthUserHook"
 
 
 export default function ProfileSection() {
     const queryClient = useQueryClient()
-
+    const navigate = useNavigate()
+    
     const { data: authuser } = useAuthUserHook()
 
     const [open, setOpen] = useState(false)
@@ -43,9 +44,10 @@ export default function ProfileSection() {
             return res
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["authUser"] })  //re-fetch data
+            queryClient.removeQueries({ queryKey: ["authUser"] })  //re-fetch data
             queryClient.removeQueries({ queryKey: ["isAdmin"] })   //clears it from the cache completely
             toast.success("Logged out successfully!")
+            navigate("/")
         },
         onError: (err: any) => {
             toast.error(err.response.data.message || "Error while logout")
