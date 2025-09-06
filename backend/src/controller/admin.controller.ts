@@ -21,14 +21,8 @@ export async function checkAdmin(req: any, res: any) {
     try {
         const currentUser = req.user
 
-        //check if the currentUser's email is in AdminSchema or not
-        const admin = await client.adminSchema.findFirst({
-            where: {
-                email: currentUser.email
-            }
-        })
-    
-        if (admin)
+        //check if the currentUser is admin or not
+        if (currentUser.isAdmin)
             return res.status(200).json({ isAdmin: true })
         else
             return res.status(200).json({ isAdmin: false })

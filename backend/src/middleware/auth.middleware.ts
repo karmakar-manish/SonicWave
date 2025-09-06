@@ -25,7 +25,8 @@ export async function protectRoute(req: any, res: any, next: any) {
                 fullname: true,
                 email: true,
                 imageUrl: true,
-                createdAt: true
+                createdAt: true,
+                isAdmin: true
             }
         })
         
@@ -58,15 +59,9 @@ export async function requireAdmin(req: any, res: any, next: any) {
     //get the current user's email
     try {
         const currentUser = req.user 
-        //check if the currentUser's email is in AdminSchema or not
-        const admin = await client.adminSchema.findFirst({
-            where: {
-                email: currentUser.email
-            }
-        })
 
-        //incase current user is not admin
-        if (!admin)
+        //check if the current user is admin or not
+        if (!currentUser.isAdmin)
             return res.status(403).json({ message: "Unauthorized - you must be an admin" })
         next()
 

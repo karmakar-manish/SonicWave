@@ -44,10 +44,10 @@ export default function ProfileSection() {
             return res
         },
         onSuccess: () => {
-            queryClient.removeQueries({ queryKey: ["authUser"] })  //re-fetch data
+            queryClient.invalidateQueries({ queryKey: ["authUser"] })  //re-fetch data
             queryClient.removeQueries({ queryKey: ["isAdmin"] })   //clears it from the cache completely
             toast.success("Logged out successfully!")
-            navigate("/")
+            // navigate("/")
         },
         onError: (err: any) => {
             toast.error(err.response.data.message || "Error while logout")
@@ -58,7 +58,7 @@ export default function ProfileSection() {
     return (
         <div className="relative">
             <div ref={avatarRef} className=" flex justify-center size-10 rounded-full transition-all hover:scale-110 cursor-pointer hover:border-2" onClick={() => setOpen((prev) => !prev)}>
-                <img src={authuser.imageUrl || "/avatar.png"} alt={authuser.fullname} className="rounded-full size-10" />
+                <img src={authuser?.imageUrl || "/avatar.png"} alt={authuser?.fullname} className="rounded-full size-10" />
             </div>
 
             {open && (

@@ -23,11 +23,8 @@ model UserSchema {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
 
-model AdminSchema {
-  id    Int    @id @default(autoincrement())
-  email String @unique
+  isAdmin Boolean? @default(false)  //checking if the user is admin or not
 }
 
 model SongSchema {
